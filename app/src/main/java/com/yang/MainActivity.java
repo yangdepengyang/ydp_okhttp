@@ -4,8 +4,10 @@ import androidx.appcompat.app.AppCompatActivity;
 
 import android.os.Bundle;
 
+import com.yang.rx_re.ICCVService;
 import com.ydp.mylibrary.http.MyCallBack;
 import com.ydp.mylibrary.http.OKHttpUtils;
+import com.ydp.mylibrary.http2.APIManager;
 
 import java.io.IOException;
 import java.util.HashMap;
@@ -22,17 +24,18 @@ public class MainActivity extends AppCompatActivity implements MyCallBack {
 
         Map<String, Object> map = new HashMap<>();
         map.put("key","值");
-        OKHttpUtils.newInstance(this).postAsyncData("请求地址", map, new MyCallBack() {
+        OKHttpUtils.newInstance(this).postAsyncDataOrLoading(this,"https://www.baidu.com/", map, new MyCallBack() {
             @Override
             public void onFailure(IOException e, Call call, String url) {
 
             }
-
             @Override
             public void onResponse(String result, Call call, String url) {
 
             }
         });
+
+
 
     }
 

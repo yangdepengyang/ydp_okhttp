@@ -1,3 +1,3 @@
-rootProject.name='dongyao'
+rootProject.name='ydp_okhttp'
 include ':app'
 include ':mylibrary'

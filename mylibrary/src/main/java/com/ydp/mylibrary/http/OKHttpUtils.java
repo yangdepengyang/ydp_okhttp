@@ -3,14 +3,18 @@ package com.ydp.mylibrary.http;
 import android.content.Context;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
+import android.widget.Toast;
 
+import com.ydp.mylibrary.http2.CacheUtil;
 import com.ydp.mylibrary.util.LogUtils;
-import com.ydp.mylibrary.util.ToastUtil;
+import com.ydp.mylibrary.view.ToastUtil;
 
 import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.IOException;
+import java.net.SocketTimeoutException;
+import java.net.UnknownHostException;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
@@ -104,58 +108,7 @@ public class OKHttpUtils {
      * @param mycallBack 回调对象
      */
     public  void postAsyncData(final String url, Map<String, Object> params, final MyCallBack mycallBack) {
-        //做数据统一加密
-        LogUtils.newInstance().e(url + "---传参集合----" + params.toString() + "----");
-
-
-
-        FormBody.Builder builder = new FormBody.Builder();
-        if (params != null && params.size() != 0) {
-            //添加键值对
-            for (Map.Entry<String, Object> entry : params.entrySet()) {
-                builder.add(entry.getKey(), String.valueOf(entry.getValue()));
-            }
-        }
-        RequestBody requestBody = builder.build();
-        Request.Builder builder1 = new Request.Builder();
-//        builder1.addHeader("token", SharePreferenceUtils.getString(Constant.token));  //将请求头以键值对形式添加，可添加多个请求头
-//        builder1.addHeader("uid", SharePreferenceUtils.getString(Constant.uid));  //将请求头以键值对形式添加，可添加多个请求头
-        //在这拼接上请求地址
-        Request request = builder1.url(Id + url).post(requestBody).build();
-        Call call = okHttpClient.newCall(request);
-
-        call.enqueue(new Callback() {
-            @Override
-            public void onFailure(Call call, IOException e) {
-                mycallBack.onFailure(e, call, url);
-            }
-
-            @Override
-            public void onResponse(Call call, Response response) throws IOException {
-                //正确返回数据中...
-                if (response != null) {
-                    String result = response.body().string();
-                    if (result.isEmpty()) {
-                        //错误信息为空 ，可能走到这里了
-                        IOException e = new IOException();
-                        mycallBack.onFailure(e, call, url);
-                    } else {
-                        if (isJson(result)) {
-                            mycallBack.onResponse(result, call, url);
-                        } else {
-                            //返回数据有误不是json字符串
-                            //错误信息为空 ，可能走到这里了
-                            IOException e = new IOException();
-                            mycallBack.onFailure(e, call, url);
-                        }
-                    }
-                } else {
-                    //错误信息为空 ，可能走到这里了
-                    IOException e = new IOException();
-                    mycallBack.onFailure(e, call, url);
-                }
-            }
-        });
+        HTTP(context,url,params,mycallBack,FormatContent.LoadingFormat.CLOSE,FormatContent.EquestFormat.POST);
     }
 
     /**
@@ -164,37 +117,26 @@ public class OKHttpUtils {
      * @param mycallBack 回调对象
      */
     public  void GetAsyncData(final String url, final MyCallBack mycallBack) {
+        HTTP(context,url,null,mycallBack,FormatContent.LoadingFormat.CLOSE,FormatContent.EquestFormat.GET);
+    }
 
 
-        //2,创建一个Request
-        final Request request = new Request.Builder()
-                .header("Content-Encoding", "gzip")
-//                .addHeader("token", SharePreferenceUtils.getString(Constant.token))
-//                .addHeader("uid", SharePreferenceUtils.getString(Constant.uid))
-//                .url(bo == true ? url : Id + url)
-                .build();
+    /**
+     * 提交键值对方法  POST
+     * @param url 请求路径
+     * @param mycallBack 回调对象
+     */
+    public  void postAsyncDataOrLoading(Context context,final String url, Map<String, Object> params, final MyCallBack mycallBack) {
+        HTTP(context,url,params,mycallBack,FormatContent.LoadingFormat.OPEN,FormatContent.EquestFormat.POST);
+    }
 
-        //3,新建一个call对象
-        Call call = okHttpClient.newCall(request);
-        //4，请求加入调度，这里是异步Get请求回调
-        call.enqueue(new Callback() {
-            @Override
-            public void onFailure(Call call, IOException e) {
-                mycallBack.onFailure(e, call, url);
-            }
-
-            @Override
-            public void onResponse(Call call, Response response) throws IOException {
-                if (response.isSuccessful()) {
-                    //响应成功
-                    String result = response.body().string();
-                    mycallBack.onResponse(result, call, url);
-                } else {
-                    mycallBack.onFailure(null, null, url);
-                }
-            }
-        });
-
+    /**
+     * 提交键值对方法  GET
+     * @param url 请求路径
+     * @param mycallBack 回调对象
+     */
+    public  void GetAsyncDataOrLoading(Context context,final String url, final MyCallBack mycallBack) {
+        HTTP(context,url,null,mycallBack,FormatContent.LoadingFormat.OPEN,FormatContent.EquestFormat.GET);
     }
 
     /**
@@ -202,8 +144,9 @@ public class OKHttpUtils {
      */
     public  void okhttpcliencancel() {
         okHttpClient.dispatcher().cancelAll();
-    }
+        ToastUtil.hideLoading();
 
+    }
 
     /**
      * 判断是否是json结构
@@ -223,4 +166,58 @@ public class OKHttpUtils {
         return true;
     }
 
+
+    public  void  HTTP(Context context, final String url, Map<String, Object> params, final MyCallBack mycallBack, FormatContent.LoadingFormat  loadingFormat, FormatContent.EquestFormat equestFormat){
+        if (!isNetworkAvailable(context)){
+            ToastUtil.error(context,"网络不可用!");
+            mycallBack.onFailure(null, null, url);
+            return;
+        }
+        //是否启动弹框
+        if (loadingFormat == FormatContent.LoadingFormat.OPEN){
+            ToastUtil.showLoading(context);
+        }
+        //判断模式 请求格式 //2,创建一个Request
+        Request request = null;
+        if (equestFormat == FormatContent.EquestFormat.POST){
+            FormBody.Builder builder = new FormBody.Builder();
+            if (params != null && params.size() != 0) {
+                //添加键值对
+                for (Map.Entry<String, Object> entry : params.entrySet()) {
+                    builder.add(entry.getKey(), String.valueOf(entry.getValue()));
+                }
+            }
+            RequestBody requestBody = builder.build();
+            Request.Builder builder1 = new Request.Builder();
+            request = builder1.url(Id + url).post(requestBody).build();
+        }else {
+             request = new Request.Builder()
+                    .header("Content-Encoding", "gzip")
+                    .build();
+        }
+
+        //3,新建一个call对象
+        Call call = okHttpClient.newCall(request);
+        //4，请求加入调度，这里是异步Get请求回调
+        call.enqueue(new Callback() {
+            @Override
+            public void onFailure(Call call, IOException e) {
+                ToastUtil.hideLoading();
+
+                mycallBack.onFailure(e, call, url);
+            }
+
+            @Override
+            public void onResponse(Call call, Response response) throws IOException {
+                ToastUtil.hideLoading();
+                if (response.isSuccessful()) {
+                    //响应成功
+                    String result = response.body().string();
+                    mycallBack.onResponse(result, call, url);
+                } else {
+                    mycallBack.onFailure(null, null, url);
+                }
+            }
+        });
+    }
 }

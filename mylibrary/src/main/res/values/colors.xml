@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="error_text_color_okttp2">#ac1818</color>
+    <color name="error_bg_color_okhttp2">#ffc9c9</color>
+    <color name="success_text_color_okhttp2">#045702</color>
+    <color name="success_bg_color_okhttp2">#bdedbc</color>
+    <color name="black_alpha55">#99000000</color>
+    <color name="white_okhttp2">#fff</color>
+    <color name="transparent">#00000000</color>
+</resources>

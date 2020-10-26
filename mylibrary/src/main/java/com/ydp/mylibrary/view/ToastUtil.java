@@ -104,28 +104,7 @@ public class ToastUtil {
         }
     }
 
-//    public static void showOrderToast(Context context, PopupOrderList.DatasEntity datasEntity) {
-//        if (datasEntity == null || context == null) {
-//            return;
-//        }
-//        context = context.getApplicationContext();
-//        Toast toast = new Toast(context);
-//        View inflate = View.inflate(context, R.layout.toast_order, null);
-//        SimpleDraweeView simpleDraweeView = (SimpleDraweeView) inflate.findViewById(R.id.ivImg);
-//        FrescoUtil.setImageSmall(simpleDraweeView, datasEntity.headImage);
-//        TextView tvName = (TextView) inflate.findViewById(R.id.tvName);
-//        String time = TimeUtils.getFitTimeSpan(TimeUtils.string2Millis(datasEntity.createDate), TimeUtils.getNowTimeMills(), 4);
-//        if (time == null) {
-//            return;
-//        }
-//
-//        toast.setView(inflate);
-//        toast.setDuration(Toast.LENGTH_SHORT);
-//        int x = SizeUtils.dp2px(22);
-//        int y = SizeUtils.dp2px(90);
-//        toast.setGravity(Gravity.TOP | Gravity.LEFT, x, y);
-//        toast.show();
-//    }
+
 
     public static Dialog getProgressDialog() {
         return mProgressDialog;

@@ -32,7 +32,7 @@ dependencies {
     // Retrofit库
     implementation 'com.squareup.retrofit2:retrofit:2.9.0'
     //日志拦截器
-    implementation 'com.squareup.okhttp3:logging-interceptor:3.6.0'
+    implementation 'com.squareup.okhttp3:logging-interceptor:3.12.0'
     //添加retrofit gson转换会自动下载gson
     implementation 'com.squareup.retrofit2:converter-gson:2.2.0'
     //RxJava依赖

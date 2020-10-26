@@ -44,7 +44,6 @@ public class MainActivity extends AppCompatActivity {
 
             }
         });
-        //
         //请求二
          ICCVService iccvService = ServiceManager.getInstance().createService(ICCVService.class);
         APIManager.startRequest(iccvService.transCcvToPoint(), new ResourceObserver<RequestResult<Object>>() {

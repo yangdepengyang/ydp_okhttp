@@ -33,10 +33,9 @@ public class APIManager {
      *不惜带加载框
      * @param observable
      * @param listener
-     * @param context
      * @param <T>
      */
-    public static <T> void startRequest(final Observable<RequestResult<T>> observable, final RequestListener<T> listener, Context context) {
+    public static <T> void startRequest(final Observable<RequestResult<T>> observable, final RequestListener<T> listener) {
 
         if (observable == null) {
             return;

@@ -2,7 +2,6 @@ package com.ydp.mylibrary.http2;
 
 import android.util.Log;
 
-
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
@@ -106,7 +105,7 @@ public class CacheUtil {
         }
     }
 
-    public <T> void onSuccess(Observable observable, RequestListener listener, T data) {
+    public <T> void onSuccess(Observable observable, RequestListener listener,  RequestResult<T> data) {
         List<RequestListener> listeners = getListeners(observable, false);
         if (listeners != null) {
             for (RequestListener l: listeners) {
@@ -114,6 +113,16 @@ public class CacheUtil {
             }
         } else {
             listener.onSuccess(data);
+        }
+    }
+    public <T> void onSuccessError (Observable observable, RequestListener listener, RequestResult<T> data) {
+        List<RequestListener> listeners = getListeners(observable, false);
+        if (listeners != null) {
+            for (RequestListener l: listeners) {
+                l.onSuccessError(data);
+            }
+        } else {
+            listener.onSuccessError(data);
         }
     }
 

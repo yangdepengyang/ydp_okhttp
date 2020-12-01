@@ -20,19 +20,17 @@ android {
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
         }
     }
+    //配置jdk特性  请求框架出问题添加
+    compileOptions{
+        sourceCompatibility JavaVersion.VERSION_1_8
+        targetCompatibility JavaVersion.VERSION_1_8
+    }
 
 }
 
 dependencies {
     api fileTree(dir: 'libs', include: ['*.jar'])
-    //请求类
-    api 'com.squareup.okhttp3:okhttp:4.7.2'
-    //json数据处理类
-    api 'com.google.code.gson:gson:2.8.6'
-    // Retrofit库
-    api 'com.squareup.retrofit2:retrofit:2.9.0'
-    //日志拦截器
-    api 'com.squareup.okhttp3:logging-interceptor:3.12.0'
+    //添加rxjava
     //添加retrofit gson转换会自动下载gson
     api 'com.squareup.retrofit2:converter-gson:2.2.0'
     //RxJava依赖
@@ -42,5 +40,14 @@ dependencies {
     api 'io.reactivex.rxjava2:rxjava:2.2.19'
     api 'io.reactivex.rxjava2:rxandroid:2.1.1'
     api 'com.squareup.retrofit2:retrofit:2.9.0'
-    implementation 'androidx.swiperefreshlayout:swiperefreshlayout:1.1.0'
+    //下拉刷新
+    api 'androidx.swiperefreshlayout:swiperefreshlayout:1.1.0'
+    //打印
+    api 'com.orhanobut:logger:1.15'
+    //用于拦截请求 兼容低版本不要随意升级 高版只到最低24
+    implementation 'com.squareup.okhttp3:logging-interceptor:3.5.0'
+    //用于加密类
+    api 'com.google.guava:guava:24.1-jre'
+    //图片压缩
+    api 'top.zibin:Luban:1.1.2'
 }

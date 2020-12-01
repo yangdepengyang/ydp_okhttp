@@ -5,7 +5,9 @@ package com.ydp.mylibrary.http2;
 public interface RequestListener<E> {
     void onStart();
 
-    void onSuccess(E result);
+    void onSuccess(RequestResult<E> result);
+
+    void onSuccessError(RequestResult<E> result);
 
     void onError(Throwable e);
 
